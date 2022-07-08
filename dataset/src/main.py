@@ -7,18 +7,20 @@ class Process:
         # instance of Sql
         self.database = db.Sql()
 
-        # instance of User
-        self.user = scraping.User()
+        # instance of Users
+        self.user = scraping.Users()
+
+        # instance of Problems
+        self.submission = scraping.Submissions()
 
     def get_info(self):
-        if not self.database.is_exist_user_table():
-            self.user.get_userinfo()
-
-        # instance of Problem
+        self.user.get_users()
+        self.submission.get_submissions()
 
 
 def main():
     process = Process()
+
     process.get_info()
 
 

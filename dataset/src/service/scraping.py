@@ -5,16 +5,16 @@ import re
 from bs4 import BeautifulSoup
 
 
-class User:
+class Users:
     def __init__(self):
         self.ranking_url = 'https://atcoder.jp/ranking?page='
         self.userList = []
         self.ratingList = []
         self.database = db.Sql()
 
-    def get_userinfo(self):
+    def get_users(self):
         print('----------')
-        print('Start collecting atcoder\'s info')
+        print('Start collecting user info')
         print('----------\n')
 
         # top 10000 user's datas
@@ -32,8 +32,23 @@ class User:
                     self.ratingList.append(int(rating.text))
                 is_rating += 1
 
-        self.database.set_data(self.userList, self.ratingList)
+        self.database.set_user_data(self.userList, self.ratingList)
 
 
-class Problem:
-    pass
+class Submissions:
+    def __init__(self):
+        self.submission_url = ''
+        self.userNameList = []
+        self.dataList = []
+        self.contestNameList = []
+        self.statusList = []
+        self.codeLengthList = []
+        self.memoryUsageList = []
+        self.database = db.Sql()
+
+    def get_submissions(self):
+        print('----------')
+        print('Start collecting user info')
+        print('----------\n')
+
+

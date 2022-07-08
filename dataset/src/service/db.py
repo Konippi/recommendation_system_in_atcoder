@@ -41,22 +41,7 @@ class Sql:
         self.conn.commit()
         self.conn.close()
 
-    def is_exist_user_table(self):
-        self.connect_db()
-
-        sql = 'SELECT COUNT(*) FROM Users'
-        self.cur.execute(sql)
-        user_num = int(self.cur.fetchall()[0][0])
-
-        if user_num == 10000:
-            print('----------')
-            print('User table already exists')
-            print('----------\n')
-            return True
-
-        return False
-
-    def set_data(self, users, ratings):
+    def set_user_data(self, users, ratings):
         self.connect_db()
 
         sql = 'INSERT INTO Users(user_name, user_rating) VALUES(%s, %s)'
@@ -68,6 +53,6 @@ class Sql:
                 print('(user: ' + users[i] + ', rating: ' + str(ratings[i]) + ')')
 
             except mysql.connector.Error as e:
-                print('Something went wrong: {}'.format(e))
+                print('Something went wrong: ' + e)
 
         self.close_db()
