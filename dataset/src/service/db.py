@@ -41,6 +41,19 @@ class Sql:
         self.conn.commit()
         self.conn.close()
 
+    def truncate(self, table_name):
+        self.connect_db()
+
+        sql1 = 'SET FOREIGN_KEY_CHECKS = 0'
+        sql2 = 'TRUNCATE TABLE {}'
+        sql3 = 'SET FOREIGN_KEY_CHECKS = 1'
+
+        self.cur.execute(sql1)
+        self.cur.execute(sql2.format(table_name))
+        self.cur.execute(sql3)
+
+        self.close_db()
+
     def set_user_data(self, users, ratings):
         self.connect_db()
 
