@@ -1,0 +1,7 @@
+*.cfg
+
+.idea
+
+*.iml
+
+db/data
