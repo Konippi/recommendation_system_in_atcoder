@@ -11,6 +11,7 @@ class Sql:
         self.conn = None
 
     def connect_db(self):
+        cur = None
         conn = None
 
         try:
@@ -62,7 +63,7 @@ class Sql:
                 self.cur.execute(sql, users_info)
 
             except mysql.connector.Error as e:
-                print('Something went wrong: ' + e)
+                print('Something went wrong: ' + str(e))
 
         self.close_db()
 
@@ -80,7 +81,7 @@ class Sql:
                 user_list.append(user_data[i][0])
 
         except mysql.connector.Error as e:
-            print('Something went wrong: ' + e)
+            print('Something went wrong: ' + str(e))
 
         self.close_db()
 
@@ -100,7 +101,7 @@ class Sql:
                 user_details.append(list(result))
 
         except mysql.connector.Error as e:
-            print('Something went wrong: ' + e)
+            print('Something went wrong: ' + str(e))
 
         self.close_db()
 
@@ -111,12 +112,14 @@ class Sql:
 
         sql = 'SELECT contest_num FROM Submissions ORDER BY contest_num DESC'
 
+        result = None
+
         try:
             self.cur.execute(sql)
             result = self.cur.fetchall()[0][0]
 
         except mysql.connector.Error as e:
-            print('Something went wrong: ' + e)
+            print('Something went wrong: ' + str(e))
 
         self.close_db()
 
@@ -130,12 +133,14 @@ class Sql:
 
         sql = 'SELECT * FROM Submissions WHERE contest_num = ' + str(contest)
 
+        result = None
+
         try:
             self.cur.execute(sql)
             result = len(self.cur.fetchall())
 
         except mysql.connector.Error as e:
-            print('Something went wrong: ' + e)
+            print('Something went wrong: ' + str(e))
 
         self.close_db()
 
@@ -165,7 +170,7 @@ class Sql:
                 self.cur.execute(sql, submissions_info)
 
             except mysql.connector.Error as e:
-                print('Something went wrong: ' + e)
+                print('Something went wrong: ' + str(e))
 
         print('complete!')
 
@@ -186,7 +191,7 @@ class Sql:
                 submission_details.append(list(result))
 
         except mysql.connector.Error as e:
-            print('Something went wrong: ' + e)
+            print('Something went wrong: ' + str(e))
 
         self.close_db()
 

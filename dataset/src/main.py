@@ -4,17 +4,17 @@ import time
 
 class Process:
     def __init__(self):
-        self.users = scraping.Users()
-        self.submissions = scraping.Submissions()
+        self._users = scraping.Users()
+        self._submissions = scraping.Submissions()
 
     def collect_info(self):
-        self.users.collect_users()
-        self.submissions.collect_submissions()
+        self._users.collect_users()
+        self._submissions.collect_submissions()
 
 
 def main():
-    process = Process()
-    process.collect_info()
+    _process = Process()
+    _process.collect_info()
 
     # timer end
     time_end = time.time()

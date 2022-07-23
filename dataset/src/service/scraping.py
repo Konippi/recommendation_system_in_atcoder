@@ -14,8 +14,8 @@ class Data:
     userList = []
     next_contest = 1
     latest_contest = 1
-    sql = db.Sql()
-    toCsv = make_csv.Csv()
+    _sql = db.Sql()
+    _toCsv = make_csv.Csv()
 
 
 class Users(Data):
@@ -33,13 +33,13 @@ class Users(Data):
 
         # truncate user's data
         if input('Do you want truncate the user\'s data? (y/n) > ') == 'y':
-            Data.sql.truncate('Users')
+            Data._sql.truncate('Users')
         else:
-            Data.userList = self.sql.get_users_data(self.user_num)
+            Data.userList = self._sql.get_users_data(self.user_num)
             return
 
         # top 1000 user's data
-        for page_num in range(self.user_num//100):
+        for page_num in range(self.user_num // 100):
             html = requests.get(self.ranking_url + str(page_num + 1), headers=Data.UA)
             soup = BeautifulSoup(html.content, 'html.parser')
 
@@ -60,7 +60,7 @@ class Users(Data):
 
             time.sleep(0.5)
 
-        Data.sql.set_users_data(self.user_num, self.userList, self.ratingList)
+        Data._sql.set_users_data(self.user_num, self.userList, self.ratingList)
         Data.userList = self.userList
 
 
@@ -101,23 +101,23 @@ class Submissions(Data):
 
         # truncate submission's data
         if input('Do you want truncate the submission\'s data? (y/n) > ') == 'y':
-            Data.sql.truncate('Submissions')
+            Data._sql.truncate('Submissions')
         else:
-            Data.next_contest = int(self.sql.get_now_contest()) + 1
-            if Data.next_contest == Data.latest_contest+1:
+            Data.next_contest = int(self._sql.get_now_contest()) + 1
+            if Data.next_contest == Data.latest_contest + 1:
                 if input('Do you want make the csvfile? (y/n) > ') == 'y':
-                    Data.toCsv.make_csv()
+                    Data._toCsv.make_csv()
                 return
 
         # Contest: now contest - latest contest
-        for contest in range(Data.next_contest, Data.latest_contest+1):
+        for contest in range(Data.next_contest, Data.latest_contest + 1):
             print('\n----- ABC' + str(contest) + ' -----\n')
 
             # initialization
             self.initialization()
 
             # the existed contest
-            if self.sql.is_existed(contest):
+            if self._sql.is_existed(contest):
                 print('already existed!')
                 continue
 
@@ -195,7 +195,7 @@ class Submissions(Data):
 
                 time.sleep(0.5)
 
-            Data.sql.set_submissions_data(self.data_num, self.userNameList, self.dateList,
-                                          self.contestList, self.problemList, self.languageList,
-                                          self.statusList, self.codeLengthList, self.runtimeList,
-                                          self.memoryUsageList)
+            Data._sql.set_submissions_data(self.data_num, self.userNameList, self.dateList,
+                                           self.contestList, self.problemList, self.languageList,
+                                           self.statusList, self.codeLengthList, self.runtimeList,
+                                           self.memoryUsageList)
