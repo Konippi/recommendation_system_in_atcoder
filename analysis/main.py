@@ -5,8 +5,8 @@ class Process:
     def __init__(self):
         self._ac = ac.Ac()
 
-    def cal_ratio_ac(self):
-        self._ac.set_data()
+    def calc(self):
+        self._ac.calc_ratio_ac()
 
 
 def main():

@@ -24,3 +24,6 @@ class Ac(Data):
 
         Data.userList = self.userList
         Data.submissionList = self.submissionList
+
+    def calc_ratio_ac(self):
+        self.set_data()
