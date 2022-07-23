@@ -1,9 +1,9 @@
-.idea
-
 *.cfg
-
-dataset/.idea
 
 *.iml
 
-db/data
+dataset/.idea
+
+.idea
+
+dataset/db/data
