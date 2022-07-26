@@ -22,7 +22,7 @@ class Users(Data):
     def __init__(self):
         self.ranking_url = 'https://atcoder.jp/ranking?page='
         self.page = 0
-        self.user_num = 1000
+        self.user_num = 100
         self.userList = []
         self.ratingList = []
 
@@ -87,6 +87,9 @@ class Submissions(Data):
         self.problemList.clear()
         self.languageList.clear()
         self.statusList.clear()
+        self.codeLengthList.clear()
+        self.runtimeList.clear()
+        self.memoryUsageList.clear()
 
     def collect_submissions(self):
         # latest contest
@@ -169,11 +172,10 @@ class Submissions(Data):
                             code_length = detail.text
                             self.codeLengthList.append(code_length)
 
-                        # CE process
-                        if status == 'CE' and detail_num == 1:
-                            self.runtimeList.append(str(0) + 'ms')
-                            self.memoryUsageList.append(str(0) + 'KB')
-                            continue
+                            # CE process
+                            if status == 'CE':
+                                self.runtimeList.append(str(0) + 'ms')
+                                self.memoryUsageList.append(str(0) + 'KB')
 
                         # runtime
                         if detail_num == 2:

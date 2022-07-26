@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS Submissions(
     submission_id INT AUTO_INCREMENT,
     user_name VARCHAR(32) NOT NULL,
-    date DATE NOT NULL,
+    date VARCHAR(32) NOT NULL,
     contest_num VARCHAR(4) NOT NULL,
     problem_name VARCHAR(64) NOT NULL,
     language VARCHAR(64) NOT NULL,
