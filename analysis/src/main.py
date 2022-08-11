@@ -1,17 +1,17 @@
-from src import ac
+from service import calc
 
 
 class Process:
     def __init__(self):
-        self._ac = ac.Ac()
+        self._calc = calc.Calc()
 
     def calc(self):
-        self._ac.calc_ratio_ac()
+        self._calc.calc()
 
 
 def main():
     _process = Process()
-    _process.cal_ratio_ac()
+    _process.calc()
 
 
 if __name__ == '__main__':
