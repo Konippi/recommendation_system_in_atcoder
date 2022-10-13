@@ -55,7 +55,7 @@ class Sql:
     def set_users_data(self, user_num, user_list, rating_list):
         self.connect_db()
 
-        sql = 'INSERT INTO Users(user_name, user_rating) VALUES(%s, %s)'
+        sql = 'INSERT INTO users(user_name, user_rating) VALUES(%s, %s)'
 
         for i in range(user_num):
             users_info = [user_list[i], rating_list[i]]
@@ -72,7 +72,7 @@ class Sql:
 
         user_list = []
 
-        sql = 'SELECT user_name FROM Users'
+        sql = 'SELECT user_name FROM users'
 
         try:
             self.cur.execute(sql)
@@ -92,7 +92,7 @@ class Sql:
 
         user_details = []
 
-        sql = 'SELECT user_name, user_rating FROM Users'
+        sql = 'SELECT user_name, user_rating FROM users'
 
         try:
             self.cur.execute(sql)
@@ -110,7 +110,7 @@ class Sql:
     def get_now_contest(self):
         self.connect_db()
 
-        sql = 'SELECT contest_num FROM Submissions ORDER BY contest_num DESC'
+        sql = 'SELECT contest_num FROM submissions ORDER BY contest_num DESC'
 
         result = None
 
@@ -131,7 +131,7 @@ class Sql:
     def is_existed(self, contest):
         self.connect_db()
 
-        sql = 'SELECT * FROM Submissions WHERE contest_num = ' + str(contest)
+        sql = 'SELECT * FROM submissions WHERE contest_num = ' + str(contest)
 
         result = None
 
@@ -146,26 +146,28 @@ class Sql:
 
         return result > 0
 
-    def set_submissions_data(self, data_num, user_name_list, date_list, contest_list, problem_list, language_list,
+    def set_submissions_data(self, data_num, user_name_list, date_list, contest_list,
+                             problem_difficulty_list, problem_title_list, language_list,
                              status_list, code_length_list, runtime_list, memory_usage_list):
         self.connect_db()
 
-        sql = 'INSERT INTO Submissions(' \
+        sql = 'INSERT INTO submissions(' \
               'user_name,' \
               'date,' \
               'contest_num,' \
-              'problem_name,' \
+              'problem_difficulty,' \
+              'problem_title,' \
               'language,' \
               'status,' \
               'code_len,' \
               'runtime,' \
-              'memory_usage) '\
-              'VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+              'memory_usage) ' \
+              'VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
 
         for i in range(data_num):
-            submissions_info = [user_name_list[i], date_list[i], contest_list[i], problem_list[i],
-                                language_list[i], status_list[i], code_length_list[i], runtime_list[i],
-                                memory_usage_list[i]]
+            submissions_info = [user_name_list[i], date_list[i], contest_list[i], problem_difficulty_list[i],
+                                problem_title_list[i], language_list[i], status_list[i], code_length_list[i],
+                                runtime_list[i], memory_usage_list[i]]
             try:
                 self.cur.execute(sql, submissions_info)
 
@@ -181,8 +183,9 @@ class Sql:
 
         submission_details = []
 
-        sql = 'SELECT user_name, date, contest_num, problem_name, language, status, code_len, runtime, memory_usage ' \
-              'FROM Submissions'
+        sql = 'SELECT user_name, date, contest_num, problem_difficulty, problem_title, language, ' \
+              'status, code_len, runtime, memory_usage ' \
+              'FROM submissions'
 
         try:
             self.cur.execute(sql)
@@ -196,3 +199,38 @@ class Sql:
         self.close_db()
 
         return submission_details
+
+    def set_problems_data(self, problem_num, contest_list, difficulty_list, title_list, statement_list):
+        self.connect_db()
+
+        sql = 'INSERT INTO problems(contest, difficulty, title, statement) VALUES(%s, %s, %s, %s)'
+
+        for i in range(problem_num):
+            problems_info = [contest_list[i], difficulty_list[i], title_list[i], statement_list[i]]
+            try:
+                self.cur.execute(sql, problems_info)
+
+            except mysql.connector.Error as e:
+                print('Something went wrong: ' + str(e))
+
+        self.close_db()
+
+    def get_problem_details(self):
+        self.connect_db()
+
+        problem_details = []
+
+        sql = 'SELECT contest, difficulty, title, statement FROM problems'
+
+        try:
+            self.cur.execute(sql)
+            results = self.cur.fetchall()
+            for result in results:
+                problem_details.append(list(result))
+
+        except mysql.connector.Error as e:
+            print('Something went wrong: ' + str(e))
+
+        self.close_db()
+
+        return problem_details

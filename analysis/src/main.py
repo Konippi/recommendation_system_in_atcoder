@@ -1,4 +1,7 @@
 from service import calc
+from fastapi import FastAPI
+
+app = FastAPI()
 
 
 class Process:
@@ -9,6 +12,7 @@ class Process:
         self._calc.calc()
 
 
+@app.get('/')
 def main():
     _process = Process()
     _process.calc()

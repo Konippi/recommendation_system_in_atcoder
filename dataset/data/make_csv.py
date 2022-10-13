@@ -4,20 +4,26 @@ from dataset.src.service import db
 
 class Csv:
     def __init__(self):
-        self.userList = []
-        self.submissionList = []
+        self.user_list = []
+        self.submission_list = []
+        self.problem_list = []
         self.sql = db.Sql()
 
     def make_csv(self):
-        self.userList = self.sql.get_user_details()
-        self.submissionList = self.sql.get_submission_details()
+        self.user_list = self.sql.get_user_details()
+        self.submission_list = self.sql.get_submission_details()
+        self.problem_list = self.sql.get_problem_details()
 
-        with open('../csv/data/user.csv', 'w', newline='', errors='ignore') as f_user:
+        with open('../data/csv/user.csv', 'w', newline='', errors='ignore') as f_user:
             writer_user = csv.writer(f_user)
-            writer_user.writerows(self.userList)
+            writer_user.writerows(self.user_list)
 
-        with open('../csv/data/submission.csv', 'w', newline='', errors='ignore') as f_submission:
+        with open('../data/csv/submission.csv', 'w', newline='', errors='ignore') as f_submission:
             writer_submission = csv.writer(f_submission)
-            writer_submission.writerows(self.submissionList)
+            writer_submission.writerows(self.submission_list)
+
+        with open('../data/csv/problem.csv', 'w', newline='', errors='ignore') as f_problem:
+            writer_problem = csv.writer(f_problem)
+            writer_problem.writerows(self.problem_list)
 
         print('complete!')
