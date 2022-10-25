@@ -1,7 +1,9 @@
+import sys
+sys.path.append('../../')
+from backend.src.metadata.data import Data
 import numpy as np
 import csv
 import statistics
-from analysis.src.metadata.data import Data
 
 
 def normalization(vec):
@@ -10,35 +12,34 @@ def normalization(vec):
     return vec / vec_length
 
 
-class Ac(Data):
+class Recommend(Data):
     def __init__(self):
+        self.ave_submission_num = None
         self.user_list = []
         self.submission_list = []
         self.problem_list = []
+        self.problem_dict = {}
         self.user_based_table = []
         self.cos_similarity_dict = {}
         self.cos_similarity_tuple = ()
-        self.recommend_problem_set = set()
         self.target_user_list = []
-
-        # test data
-        self.test_vec = []
-        self.test_problem = ['200', 'B']
+        self.recommend_problem_list = []
+        self.recommend_problem_with_user_dict = {}
 
     # set data from csv
     def set_data(self):
-        csv_file = open('../dataset/data/csv/user.csv', 'r')
+        csv_file = open('../../dataset/data/csv/user.csv', 'r')
         users = csv.reader(csv_file)
         for user in users:
             self.user_list.append(user[0])
             self.rating_dict[user[0]] = int(user[1])
 
-        csv_file = open('../dataset/data/csv/submission.csv', 'r')
+        csv_file = open('../../dataset/data/csv/submission.csv', 'r')
         submissions = csv.reader(csv_file)
         for submission in submissions:
             self.submission_list.append(submission)
 
-        csv_file = open('../dataset/data/csv/problem.csv', 'r')
+        csv_file = open('../../dataset/data/csv/problem.csv', 'r')
         problems = csv.reader(csv_file)
         for problem in problems:
             self.problem_list.append(problem)
@@ -46,6 +47,9 @@ class Ac(Data):
         Data.userList = self.user_list
         Data.submissionList = self.submission_list
         Data.problem_list = self.problem_list
+
+        for problem in self.problem_list:
+            self.problem_dict[(problem[0], problem[1])] = problem[2]
 
     # filter user who has no submissions for ABC
     def filter_user(self):
@@ -86,17 +90,18 @@ class Ac(Data):
             self.submission_by_user_dict[filter_user] = sorted(self.submission_by_user_dict[filter_user])
 
     def set_test_data(self):
+        Data.test_vec.clear()
         for problem in self.problem_list:
-            if problem[0] == self.test_problem[0] and problem[1] == self.test_problem[1]:
-                self.test_vec.append(1)
+            if problem[0] == Data.test_problem[0] and problem[1] == self.test_problem[1]:
+                Data.test_vec.append(1)
             else:
-                self.test_vec.append(0)
+                Data.test_vec.append(0)
 
     def set_target_users(self):
         for filter_user in self.filter_user_list:
             has_data = False
             for submissions in self.submission_by_user_dict[filter_user]:
-                if submissions[1] == self.test_problem[0] and submissions[2] == self.test_problem[1]:
+                if submissions[1] == Data.test_problem[0] and submissions[2] == Data.test_problem[1]:
                     has_data = True
                     break
             if has_data:
@@ -126,13 +131,11 @@ class Ac(Data):
         # len(self.user_based_table) = len(self.target_user_list)
         for i in range(len(self.user_based_table)):
             normalized_ac_vec = normalization(self.user_based_table[i])
-            test_vec = normalization(self.test_vec)
+            test_vec = normalization(Data.test_vec)
             self.cos_similarity_dict[np.dot(normalized_ac_vec, test_vec)] = self.target_user_list[i]
 
         # self.cos_similarity_tuple: (cos_similarity, user_name)
         self.cos_similarity_tuple = sorted(self.cos_similarity_dict.items(), reverse=True)
-        self.cos_similarity_tuple = self.cos_similarity_tuple[:Data.collaborative_filtering_target_num]
-        print(self.cos_similarity_tuple)
 
     def recommend_problem(self):
         for cos_similarity in self.cos_similarity_tuple:
@@ -140,16 +143,33 @@ class Ac(Data):
             data_idx = 0
             for idx in range(len(submissions)):
                 # conditions
-                if submissions[idx][1] == self.test_problem[0] and submissions[idx][2] == self.test_problem[1] \
+                if submissions[idx][1] == Data.test_problem[0] and submissions[idx][2] == Data.test_problem[1] \
                         and submissions[idx][4] == 'AC' and idx + 1 < len(submissions):
                     data_idx = idx
                     break
             for nxt in range(data_idx+1, len(submissions)):
-                if submissions[nxt][2] >= self.test_problem[1] and submissions[nxt][4] == 'AC':
-                    self.recommend_problem_set.add((submissions[nxt][1], submissions[nxt][2]))
+                filter_diff = chr(ord(Data.test_problem[1])+2) if Data.test_problem[1] < 'F' else 'Ex'
+                if  Data.test_problem[1] <= submissions[nxt][2] <= filter_diff and submissions[nxt][4] == 'AC'\
+                    and (submissions[nxt][1], submissions[nxt][2]) != (Data.test_problem[0], Data.test_problem[1]):
+                    submission_tuple = (submissions[nxt][1], submissions[nxt][2])
+                    if submission_tuple not in self.recommend_problem_list:
+                        self.recommend_problem_list.append(submission_tuple)
+                        self.recommend_problem_with_user_dict[submission_tuple] = {
+                            'name': cos_similarity[1],
+                            'cos_similarity': cos_similarity[0]
+                        }
                     break
-        self.recommend_problem_set.discard((self.test_problem[0], self.test_problem[1]))
-        print(self.recommend_problem_set)
+        recommend_problem_dict_list = []
+        for recommend_problem in list(self.recommend_problem_list):
+            recommend_problem_dict_list.append({
+                'contest': recommend_problem[0],
+                'problem': {
+                    'diff': recommend_problem[1],
+                    'title': self.problem_dict[(recommend_problem[0], recommend_problem[1])]
+                },
+                'user': self.recommend_problem_with_user_dict[(recommend_problem[0],recommend_problem[1])]
+            })
+        Data.recommend_problem_dict_list = recommend_problem_dict_list
 
     # calculate feature vector
     def calc_data(self):
@@ -166,7 +186,7 @@ class Ac(Data):
 
 class Calc:
     def __init__(self):
-        self._ac = Ac()
+        self._recommend = Recommend()
 
     def calc(self):
-        self._ac.calc_data()
+        self._recommend.calc_data()

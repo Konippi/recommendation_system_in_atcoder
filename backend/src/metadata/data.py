@@ -8,6 +8,12 @@ class Data:
 
     problem_list = []  # 1328
 
+    test_vec = []
+
+    test_problem = []
+
+    recommend_problem_dict_list = []
+
     # Dict #
     # {user: rating}
     rating_dict = {}
@@ -20,4 +26,3 @@ class Data:
 
     # Num #
     ave_submission_num = None
-    collaborative_filtering_target_num = 7
