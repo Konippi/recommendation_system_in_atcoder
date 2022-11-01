@@ -1,24 +1,15 @@
-import time
-
+from dataset.metadata.data import Data
 from dataset.src.service import db
 
+import time
 import requests
 import re
-
 from bs4 import BeautifulSoup
-
-
-class Data:
-    UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
-                        AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'}
-    user_list = []
-    last_contest = 250
-    next_contest = 1
-    _sql = db.Sql()
 
 
 class Users(Data):
     def __init__(self):
+        self._sql = db.Sql()
         self.ranking_url = 'https://atcoder.jp/ranking?page='
         self.page = 0
         self.user_num = 100
@@ -32,7 +23,7 @@ class Users(Data):
 
         # truncate user's data
         if input('Do you want to get the user\'s data? (y/n) > ') == 'y':
-            Data._sql.truncate('users')
+            self._sql.truncate('users')
         else:
             Data.user_list = self._sql.get_users_data(self.user_num)
             return
@@ -57,7 +48,7 @@ class Users(Data):
 
             print(str(100 * self.page) + ' users: complete!')
 
-        Data._sql.set_users_data(self.user_num, self.user_list, self.rating_list)
+        self._sql.set_users_data(self.user_num, self.user_list, self.rating_list)
         Data.user_list = self.user_list
 
 
@@ -74,7 +65,7 @@ class Submissions(Data):
         self.code_length_list = []
         self.runtime_list = []
         self.memory_usage_list = []
-        self.database = db.Sql()
+        self._sql = db.Sql()
 
     # clear
     def initialization(self):
@@ -98,7 +89,7 @@ class Submissions(Data):
 
         # truncate submission's data
         if input('Do you want to get the submission\'s data? (y/n) > ') == 'y':
-            Data._sql.truncate('submissions')
+            self._sql.truncate('submissions')
         else:
             Data.next_contest = int(self._sql.get_now_contest()) + 1
             if Data.next_contest == Data.last_contest + 1:
@@ -193,7 +184,7 @@ class Submissions(Data):
 
                 time.sleep(0.5)
 
-            Data._sql.set_submissions_data(self.data_num, self.user_name_list, self.date_list,
+            self._sql.set_submissions_data(self.data_num, self.user_name_list, self.date_list,
                                            self.contest_list, self.problem_difficulty_list, self.problem_title_list,
                                            self.language_list, self.status_list, self.code_length_list,
                                            self.runtime_list, self.memory_usage_list)
@@ -201,6 +192,7 @@ class Submissions(Data):
 
 class Problems(Data):
     def __init__(self):
+        self._sql = db.Sql()
         self.contest_list = []
         self.difficulty_list = []
         self.title_list = []
@@ -214,7 +206,7 @@ class Problems(Data):
 
         # truncate problem's data
         if input('Do you want to get the problem\'s data? (y/n) > ') == 'y':
-            Data._sql.truncate('problems')
+            self._sql.truncate('problems')
         else:
             return
 
@@ -303,7 +295,7 @@ class Problems(Data):
 
             print('contest' + str(contest) + ': completed!')
 
-        Data._sql.set_problems_data(len(self.title_list), self.contest_list, self.difficulty_list, self.title_list, self.statement_list)
+        self._sql.set_problems_data(len(self.title_list), self.contest_list, self.difficulty_list, self.title_list, self.statement_list)
 
 
 def transform_difficulty(difficulty):

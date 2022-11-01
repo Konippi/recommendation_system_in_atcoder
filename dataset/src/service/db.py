@@ -38,15 +38,15 @@ class Sql:
         self.conn.commit()
         self.conn.close()
 
-    def truncate(self, table_name):
+    def truncate(self, table_name: str):
         self.connect_db()
 
         sql1 = 'SET FOREIGN_KEY_CHECKS = 0'
-        sql2 = 'TRUNCATE TABLE {}'
+        sql2 = 'TRUNCATE TABLE {}'.format(table_name)
         sql3 = 'SET FOREIGN_KEY_CHECKS = 1'
 
         self.cur.execute(sql1)
-        self.cur.execute(sql2.format(table_name))
+        self.cur.execute(sql2)
         self.cur.execute(sql3)
 
         self.close_db()

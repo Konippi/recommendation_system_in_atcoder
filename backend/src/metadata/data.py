@@ -8,11 +8,11 @@ class Data:
 
     problem_list = []  # 1328
 
-    test_vec = []
+    learner_vec = []
 
-    test_problem = []
+    target_problem = ()
 
-    recommend_problem_dict_list = []
+    recommended_problem_dict_list = []
 
     # Dict #
     # {user: rating}
