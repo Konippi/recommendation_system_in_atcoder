@@ -93,19 +93,23 @@ class Recommend(Data):
 
     def set_learner_data(self, submission_info: list):
         Data.learner_vec.clear()
+        latest_ac_date = ''
         for data in submission_info:
             contest = data['contest']
             submission_list = data['submissions']
             for submission_dict in reversed(submission_list):
+                submission_date = submission_dict['date']
                 problem = submission_dict['problem'].split(' ')[0]
                 result = submission_dict['result']
                 self.problem_score_dict[(contest, problem)] = 0
                 if result == 'AC':
                     self.problem_score_dict[(contest, problem)] = 1
+                    if latest_ac_date < submission_date:
+                        Data.target_problem = (contest, problem)
+                        latest_ac_date = submission_date
+
         for problem, score in self.problem_score_dict.items():
             Data.learner_vec.append(score)
-            if score == 1:
-                Data.target_problem = problem
 
     def set_target_users(self):
         for filter_user in self.filter_user_list:
@@ -159,8 +163,8 @@ class Recommend(Data):
                     break
             for nxt in range(data_idx+1, len(submissions)):
                 filter_diff = chr(ord(Data.target_problem[1])+2) if Data.target_problem[1] not in ['F', 'G', 'Ex'] else 'Ex'
-                if Data.target_problem[1] <= submissions[nxt][2] <= filter_diff and len(submissions[nxt][2]) <= len(filter_diff)  and submissions[nxt][4] == 'AC'\
-                    and (submissions[nxt][1], submissions[nxt][2]) != (Data.target_problem[0], Data.target_problem[1]):
+                if Data.target_problem[1] <= submissions[nxt][2] <= filter_diff and len(submissions[nxt][2]) <= len(filter_diff)  \
+                        and submissions[nxt][4] == 'AC' and (submissions[nxt][1], submissions[nxt][2]) != (Data.target_problem[0], Data.target_problem[1]):
                     submission_tuple = (submissions[nxt][1], submissions[nxt][2])
                     if submission_tuple not in self.recommended_problem_list:
                         self.recommended_problem_list.append(submission_tuple)
@@ -169,8 +173,9 @@ class Recommend(Data):
                             'cos_similarity': cos_similarity[0]
                         }
                     break
+
         recommended_problem_dict_list = []
-        for recommended_problem in list(self.recommended_problem_list):
+        for recommended_problem in list(self.recommended_problem_list[:3]):
             recommended_problem_dict_list.append({
                 'contest': recommended_problem[0],
                 'problem': {

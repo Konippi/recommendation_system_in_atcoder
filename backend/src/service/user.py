@@ -45,10 +45,12 @@ class User(Data):
 
     def get_submissions_info(self, user_name: str):
         urls = []
+
         for contest in range(1, self.contest_num+1):
             urls.append('https://atcoder.jp/contests/abc{}/submissions?f.User={}'
                         .format(str(contest).zfill(3), user_name))
-        with ProcessPoolExecutor(max_workers=10) as executor:
+
+        with ProcessPoolExecutor(max_workers=12) as executor:
             results = list(executor.map(scraping, urls))
 
         return results

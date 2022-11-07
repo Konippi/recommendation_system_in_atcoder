@@ -2,9 +2,15 @@ from service import calc
 from service.user import User
 from backend.src.metadata.data import Data
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['http://localhost:3000']
+)
 
 class Process(Data):
     def __init__(self):
@@ -20,8 +26,10 @@ def get_recommended_problems(user_name: str):
     _process = Process()
     _process.calc(submission_info=submission_info)
     return {
-        'submission_info': submission_info,
-        'recommend_problems': Data.recommended_problem_dict_list
+        'api_response': {
+            'submission_info': submission_info,
+            'recommended_problems': Data.recommended_problem_dict_list
+        }
     }
 
 if __name__ == '__main__':
