@@ -14,6 +14,7 @@ const Home: FC = () => {
                         <h2>Recommended Problems</h2>
                         <RecommendedProblemList recommendedProblems={data.api_response.recommended_problems} />
                     </div>
+                    <hr />
                     <div className={"table"}>
                         <h2>Your Submissions</h2>
                         <SubmissionsTable submissionInfo={data.api_response.submission_info} />

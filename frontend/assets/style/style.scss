@@ -3,12 +3,21 @@ h2 {
   text-align: center;
 }
 
+hr {
+  width: 80%;
+  background-color: #DCDCDC;
+  border-radius: 3px;
+}
+
 .list {
   margin: 0 auto;
   width: 50%;
-  .MuiListItem-root:hover {
-    background-color: #DCDCDC;
+  .MuiListItem-root {
+    box-shadow: 0 2px 2px 0 gray;
     border-radius: 8px;
+    &:hover{
+      background-color: #DCDCDC;
+    }
   }
 }
 

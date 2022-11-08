@@ -26,8 +26,9 @@ const RecommendedProblemList: FC<Props> = (props:Props) => {
                         </Avatar>
                     </ListItemAvatar>
                     <ListItemText
-                        primary={recommendedProblem.problem.diff + " - " + recommendedProblem.problem.title}
-                        secondary={"AtCoder Beginner Contest " + recommendedProblem.contest}
+                        primary={`${recommendedProblem.problem.diff} - ${recommendedProblem.problem.title} ` +
+                            `(AtCoder Beginner Contest ${recommendedProblem.contest})`}
+                        secondary={`recommended point: ${recommendedProblem.user.cos_similarity.toFixed(3)}`}
                     />
                 </ListItem>
             ))}

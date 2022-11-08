@@ -85,6 +85,9 @@ const SubmissionsTable: FC<Props> = (props: Props) => {
             data={convertedSubmissionInfo}
             enableFullScreenToggle={false}
             enableDensityToggle={false}
+            muiTableContainerProps={{
+                sx: {maxHeight: '280px' }
+            }}
         />
     );
 };
