@@ -1,10 +1,14 @@
-import React, {FC} from "react";
+import React, {FC, ReactElement} from "react";
 import {RecommendedProblemList, SubmissionsTable} from "../mui";
 import {useApiData} from "../../hooks";
 import {ApiResponseType} from "../../types/ApiResponseType";
 
-const Home: FC = () => {
-    const data: ApiResponseType | undefined = useApiData();
+type Props = {
+    userName: string;
+};
+
+const Home: FC<Props> = ({userName}: Props) => {
+    const data: ApiResponseType | undefined = useApiData(userName);
 
     return (
         <>

@@ -1,13 +1,13 @@
 import {useEffect, useState} from "react";
-import axios, {AxiosResponse} from "axios";
+import axios from "axios";
 import {ApiResponseType} from "../types/ApiResponseType";
 
-const useApiData = () => {
+const useApiData = (userName: string) => {
     const [data, setData] = useState<ApiResponseType>();
 
     useEffect(() => {
         const getInfo = async() => {
-            return await axios.get("http://localhost:8000/kkonishi");
+            return await axios.get(`http://localhost:8000/${userName}`);
         };
         getInfo()
             .then(res => {

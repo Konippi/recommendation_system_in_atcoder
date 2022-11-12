@@ -14,9 +14,7 @@ type ConvertedSubmissionInfoType = {
     result: string;
 };
 
-const SubmissionsTable: FC<Props> = (props: Props) => {
-    const {submissionInfo} = props;
-
+const SubmissionsTable: FC<Props> = ({submissionInfo}: Props) => {
     const columns = useMemo(() =>
         [
             {

@@ -14,8 +14,7 @@ const navigateToAtcoder = function(contest: string, diff: string) {
         "/tasks/abc" + contest + "_" + convertedDiff);
 };
 
-const RecommendedProblemList: FC<Props> = (props:Props) => {
-    const {recommendedProblems} = props;
+const RecommendedProblemList: FC<Props> = ({recommendedProblems}: Props) => {
     return (
         <List>
             {recommendedProblems.map(recommendedProblem => (
