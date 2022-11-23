@@ -17,6 +17,7 @@ class Recommend(Data):
         self.ave_submission_num = None
         self.user_list = []
         self.submission_list = []
+        self.submissions_by_user_dict = {}
         self.problem_list = []
         self.problem_dict = {}
         self.problem_score_dict = {}
@@ -75,26 +76,33 @@ class Recommend(Data):
 
     def set_submission_data_by_user(self):
         for filter_user in self.filter_user_list:
-            self.submission_by_user_dict[filter_user] = []
+            self.submissions_by_user_dict[filter_user] = []
 
         for submission in self.submission_list:
+            date = submission[1].split(' ')[0]
+            time = submission[1].split(' ')[1]
+            year = date.split('/')[2]
+            month = date.split('/')[0].zfill(2)
+            day = date.split('/')[1].zfill(2)
+            converted_date = year + '/' + month + '/' + day + '-' + time
             submission_data = [
-                submission[1],
+                converted_date,
                 submission[2],
                 submission[3],
                 submission[4],
                 submission[6]
             ]
-            self.submission_by_user_dict[submission[0]].append(submission_data)
+            self.submissions_by_user_dict[submission[0]].append(submission_data)
 
         # sort by date
         for filter_user in self.filter_user_list:
-            self.submission_by_user_dict[filter_user] = sorted(self.submission_by_user_dict[filter_user])
+            self.submissions_by_user_dict[filter_user] = sorted(self.submissions_by_user_dict[filter_user])
 
-    def set_learner_data(self, submission_info: list):
+    def set_learner_data(self, submissions_info: list):
         Data.learner_vec.clear()
         latest_ac_date = ''
-        for data in submission_info:
+
+        for data in submissions_info:
             contest = data['contest']
             submission_list = data['submissions']
             for submission_dict in reversed(submission_list):
@@ -108,13 +116,18 @@ class Recommend(Data):
                         Data.target_problem = (contest, problem)
                         latest_ac_date = submission_date
 
-        for problem, score in self.problem_score_dict.items():
+        for score in self.problem_score_dict.values():
             Data.learner_vec.append(score)
+
+        if Data.target_problem == ():
+            return False
+
+        return True
 
     def set_target_users(self):
         for filter_user in self.filter_user_list:
             has_data = False
-            for submissions in self.submission_by_user_dict[filter_user]:
+            for submissions in self.submissions_by_user_dict[filter_user]:
                 if submissions[1] == Data.target_problem[0] and submissions[2] == Data.target_problem[1]:
                     has_data = True
                     break
@@ -127,7 +140,7 @@ class Recommend(Data):
             for problem in Data.problem_list:
                 is_ac = False
                 has_data = False
-                for submissions in self.submission_by_user_dict[target_user]:
+                for submissions in self.submissions_by_user_dict[target_user]:
                     if submissions[3] == problem[2]:
                         has_data = True
                         if submissions[4] == 'AC':
@@ -143,9 +156,9 @@ class Recommend(Data):
 
     def calc_cos_similarity(self):
         # len(self.user_based_table) = len(self.target_user_list)
+        learner_vec = normalization(Data.learner_vec)
         for i in range(len(self.user_based_table)):
             normalized_ac_vec = normalization(self.user_based_table[i])
-            learner_vec = normalization(Data.learner_vec)
             self.cos_similarity_dict[np.dot(normalized_ac_vec, learner_vec)] = self.target_user_list[i]
 
         # self.cos_similarity_tuple: (cos_similarity, user_name)
@@ -153,7 +166,7 @@ class Recommend(Data):
 
     def recommend_problem(self):
         for cos_similarity in self.cos_similarity_tuple:
-            submissions = self.submission_by_user_dict[cos_similarity[1]]
+            submissions = self.submissions_by_user_dict[cos_similarity[1]]
             data_idx = 0
             for idx in range(len(submissions)):
                 # conditions
@@ -162,20 +175,26 @@ class Recommend(Data):
                     data_idx = idx
                     break
             for nxt in range(data_idx+1, len(submissions)):
-                filter_diff = chr(ord(Data.target_problem[1])+2) if Data.target_problem[1] not in ['F', 'G', 'Ex'] else 'Ex'
-                if Data.target_problem[1] <= submissions[nxt][2] <= filter_diff and len(submissions[nxt][2]) <= len(filter_diff)  \
-                        and submissions[nxt][4] == 'AC' and (submissions[nxt][1], submissions[nxt][2]) != (Data.target_problem[0], Data.target_problem[1]):
-                    submission_tuple = (submissions[nxt][1], submissions[nxt][2])
-                    if submission_tuple not in self.recommended_problem_list:
-                        self.recommended_problem_list.append(submission_tuple)
-                        self.recommended_problem_with_user_dict[submission_tuple] = {
-                            'name': cos_similarity[1],
-                            'cos_similarity': cos_similarity[0]
-                        }
-                    break
+                min_diff = Data.target_problem[1]
+                # min_diff = chr(ord(Data.target_problem[1])-1) if Data.target_problem[1] not in ['A', 'B', 'Ex'] else 'A'
+                # if Data.target_problem[1] == 'Ex':
+                #     min_diff = 'G'
+                max_diff = chr(ord(Data.target_problem[1])+1) if Data.target_problem[1] not in ['G', 'Ex'] else 'Ex'
+                if submissions[nxt][4] == 'AC' and (submissions[nxt][1], submissions[nxt][2]) != (Data.target_problem[0], Data.target_problem[1]):
+                    if min_diff <= submissions[nxt][2] <= max_diff and len(submissions[nxt][2]) <= len(max_diff):
+                        submission_tuple = (submissions[nxt][1], submissions[nxt][2])
+                        if submission_tuple not in self.recommended_problem_list:
+                            self.recommended_problem_list.append(submission_tuple)
+                            self.recommended_problem_with_user_dict[submission_tuple] = {
+                                'name': cos_similarity[1],
+                                'cos_similarity': cos_similarity[0]
+                            }
+                        break
+                    else:
+                        break
 
         recommended_problem_dict_list = []
-        for recommended_problem in list(self.recommended_problem_list[:3]):
+        for recommended_problem in list(self.recommended_problem_list):
             recommended_problem_dict_list.append({
                 'contest': recommended_problem[0],
                 'problem': {
@@ -187,21 +206,22 @@ class Recommend(Data):
         Data.recommended_problem_dict_list = recommended_problem_dict_list
 
     # calculate feature vector
-    def calc_data(self, submission_info: list):
+    def calc_data(self, submissions_info: list):
         self.set_data()
         self.filter_user()
         self.calc_ave_submission_num()
         self.set_submission_data_by_user()
-        self.set_learner_data(submission_info=submission_info)
-        self.set_target_users()
-        self.create_user_based_table()
-        self.calc_cos_similarity()
-        self.recommend_problem()
+        is_possible = self.set_learner_data(submissions_info=submissions_info)
+        if is_possible:
+            self.set_target_users()
+            self.create_user_based_table()
+            self.calc_cos_similarity()
+            self.recommend_problem()
 
 
 class Calc:
     def __init__(self):
         self._recommend = Recommend()
 
-    def calc(self, submission_info: list):
-        self._recommend.calc_data(submission_info=submission_info)
+    def calc(self, submissions_info: list):
+        self._recommend.calc_data(submissions_info=submissions_info)

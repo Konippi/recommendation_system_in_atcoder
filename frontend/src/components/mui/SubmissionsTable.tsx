@@ -1,10 +1,10 @@
 import React, {FC, useMemo} from "react";
-import {SubmissionInfoType} from "../../types/SubmissionInfoType";
+import {SubmissionsInfoType} from "../../types/SubmissionsInfoType";
 import MaterialReactTable from "material-react-table";
 import {Box} from "@mui/material";
 
 type Props = {
-    submissionInfo: SubmissionInfoType[];
+    submissionsInfo: SubmissionsInfoType[];
 };
 
 type ConvertedSubmissionInfoType = {
@@ -14,7 +14,7 @@ type ConvertedSubmissionInfoType = {
     result: string;
 };
 
-const SubmissionsTable: FC<Props> = ({submissionInfo}: Props) => {
+const SubmissionsTable: FC<Props> = ({submissionsInfo}: Props) => {
     const columns = useMemo(() =>
         [
             {
@@ -60,7 +60,7 @@ const SubmissionsTable: FC<Props> = ({submissionInfo}: Props) => {
     const convertedSubmissionInfo: Partial<ConvertedSubmissionInfoType>[] = [];
 
     // convert api response type into table type
-    submissionInfo.map(submissions => {
+    submissionsInfo.map(submissions => {
         const contest = submissions.contest;
         submissions.submissions.map(submission => {
             const submissionDate: string = submission.date;

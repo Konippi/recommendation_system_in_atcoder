@@ -1,3 +1,5 @@
+import time
+
 from dataset.metadata.data import Data
 import requests
 from bs4 import BeautifulSoup
@@ -7,10 +9,16 @@ from concurrent.futures import ProcessPoolExecutor
 def scraping(url):
     contest = url[31:34].lstrip('0')
     html = requests.get(url, headers=Data.UA)
+
+    if html.status_code == 403:
+        print('!--- For Bidden ---!')
+        exit(1)
+
     soup = BeautifulSoup(html.content, 'html.parser')
     submission_list_by_contest = []
     data_cnt = 0
     data_dict = dict()
+
     for data in soup.findAll('td'):
         if data_cnt == 0:
             # exclude timezone
@@ -32,11 +40,11 @@ def scraping(url):
             data_cnt = 0
             continue
         data_cnt += 1
+
     return {
         'contest': contest,
         'submissions': submission_list_by_contest
     }
-
 
 class User(Data):
     def __init__(self):
@@ -45,12 +53,11 @@ class User(Data):
 
     def get_submissions_info(self, user_name: str):
         urls = []
-
-        for contest in range(1, self.contest_num+1):
+        for contest in range(6, self.contest_num+1):
             urls.append('https://atcoder.jp/contests/abc{}/submissions?f.User={}'
                         .format(str(contest).zfill(3), user_name))
 
-        with ProcessPoolExecutor(max_workers=12) as executor:
+        with ProcessPoolExecutor(max_workers=6) as executor:
             results = list(executor.map(scraping, urls))
 
         return results

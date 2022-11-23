@@ -1,6 +1,6 @@
 import {SubmissionType} from "./SubmissionType";
 
-export type SubmissionInfoType = {
+export type SubmissionsInfoType = {
     contest: string;
     submissions: SubmissionType[];
 };

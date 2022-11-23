@@ -1,9 +1,9 @@
-import {SubmissionInfoType} from "./SubmissionInfoType";
+import {SubmissionsInfoType} from "./SubmissionsInfoType";
 import {RecommendedProblemsType} from "./RecommendedProblemsType";
 
 export type ApiResponseType = {
     api_response: {
-        submission_info: SubmissionInfoType[];
+        submissions_info: SubmissionsInfoType[];
         recommended_problems: RecommendedProblemsType[];
     };
 };

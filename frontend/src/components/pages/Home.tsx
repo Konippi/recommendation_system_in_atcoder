@@ -22,7 +22,7 @@ const Home: FC<Props> = ({userName}: Props) => {
                     <hr />
                     <div className={"table"}>
                         <h2>Your Submissions</h2>
-                        <SubmissionsTable submissionInfo={data.api_response.submission_info} />
+                        <SubmissionsTable submissionsInfo={data.api_response.submissions_info} />
                     </div>
                 </div>:
                 <Box sx={{display: "flex", justifyContent: "center", marginTop: "20%"}}>
