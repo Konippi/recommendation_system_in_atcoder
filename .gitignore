@@ -9,3 +9,5 @@ dataset/.idea
 dataset/db/data
 
 dataset/metadata/data.py
+
+**/__pycache__
